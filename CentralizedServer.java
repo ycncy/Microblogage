@@ -20,7 +20,7 @@ public class CentralizedServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
 
-                System.out.println("Un nouveau client s'est connecté \n///////////////////////////////////////////");
+                System.out.println("///////////////////////////////////////////\nUn nouveau client s'est connecté \n///////////////////////////////////////////");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 

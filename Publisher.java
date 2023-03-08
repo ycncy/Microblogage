@@ -2,6 +2,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Publisher {
 
@@ -17,12 +18,26 @@ public class Publisher {
         Socket client = new Socket(connectionAddress, connectionPort);
         System.out.println("Connecté au serveur : " + client.getRemoteSocketAddress());
 
+        String username = "";
+        String message = "";
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Entrez le nom d'utilisateur :");
+
+        username = scanner.nextLine();
+
+        System.out.println("Entrez le contenu de votre message :");
+
+        while (scanner.hasNext()) {
+            message += scanner.nextLine() + "\n";
+        }
+
         OutputStream outToServer = client.getOutputStream();
         DataOutputStream out = new DataOutputStream(outToServer);
 
-        String message = "Hello, serveur!";
-        out.writeBytes(message);
-        System.out.println("Message envoyé : " + message);
+        String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
+        out.writeBytes(request);
 
         client.close();
     }
