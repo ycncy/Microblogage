@@ -3,12 +3,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class Client {
+public class Publisher {
 
     private static final String connectionAddress = "localhost";
     private static final int connectionPort = 1234;
 
-    public Client(String connectionAddress, int connectionPort) {
+    public Publisher(String connectionAddress, int connectionPort) {
         //this.connectionAddress = connectionAddress;
         //this.connectionPort = connectionPort;
     }
