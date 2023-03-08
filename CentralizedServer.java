@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class CentralizedServer {
 
@@ -12,6 +13,8 @@ public class CentralizedServer {
 
     public static void run() throws IOException {
 
+        //ENTETE : PUBLISH author:@user \r\n corps \r\n
+
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             while (true) {
@@ -21,9 +24,14 @@ public class CentralizedServer {
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-                System.out.println("Message reçu par le client :");
+                String message = "";
+                int id = System.identityHashCode(in);
 
-                System.out.println(in.readLine() + "\n///////////////////////////////////////////");
+                if (in.readLine().startsWith("PUBLISH")) {
+                    message = in.readLine();
+                }
+
+                System.out.println("Message " +  id + " : " + message);
 
                 clientSocket.close();
 
