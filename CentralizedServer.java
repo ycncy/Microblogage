@@ -20,24 +20,45 @@ public class CentralizedServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
 
-                System.out.println("///////////////////////////////////////////\nUn nouveau client s'est connecté \n///////////////////////////////////////////");
+                System.out.println("///////////////////////////////////////////\nUn nouveau client s'est connecté \n");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-                String message = "";
-                int id = System.identityHashCode(in);
+                OutputStream out = clientSocket.getOutputStream();
 
-                if (in.readLine().startsWith("PUBLISH")) {
-                    message = in.readLine();
+                String[] message = in.readLine().split("\\s+");
+
+                if (message[0].equals("PUBLISH")) {
+
                 }
 
-                System.out.println("Message " +  id + " : " + message);
+                switch (message[0]) {
+                    case "PUBLISH":
+                        String[] author = message[1].split(":@");
+                        String userMessage = in.readLine();
+                        executePublish(userMessage, author[1]);
+
+                        out.write("OK".getBytes());
+                        break;
+
+                    case "RCV_IDS":
+
+
+                    case "RCV_MSG":
+
+                    default:
+                        System.out.println("ERROR");
+                }
 
                 clientSocket.close();
 
                 System.out.println("Connexion avec le client fermée");
             }
         }
+    }
+
+    private static void executePublish (String message, String author) {
+        System.out.println("Message de " + author + " : " + message);
     }
 
     public static void main(String[] args) throws IOException {

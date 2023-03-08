@@ -1,7 +1,6 @@
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.Scanner;
 
 public class Publisher {
@@ -34,10 +33,13 @@ public class Publisher {
         }
 
         OutputStream outToServer = client.getOutputStream();
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
         DataOutputStream out = new DataOutputStream(outToServer);
 
         String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
         out.writeBytes(request);
+
+        System.out.println(inFromServer.readLine());
 
         client.close();
     }
