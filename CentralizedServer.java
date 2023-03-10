@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
+import java.sql.*;
 
 public class CentralizedServer {
 
@@ -57,11 +57,12 @@ public class CentralizedServer {
         }
     }
 
-    private static void executePublish (String message, String author) {
+    private static void executePublish(String message, String author) {
         System.out.println("Message de " + author + " : " + message);
     }
 
-    public static void main(String[] args) throws IOException {
-        run();
+    public static void main(String[] args) throws ClassNotFoundException {
+
     }
+
 }
