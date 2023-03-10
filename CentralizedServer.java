@@ -11,7 +11,7 @@ public class CentralizedServer {
         //this.port = port;
     }
 
-    public static void run() throws IOException {
+    public static void run() throws IOException, RuntimeException {
 
         //ENTETE : PUBLISH author:@user \r\n corps \r\n
 
@@ -28,26 +28,15 @@ public class CentralizedServer {
 
                 String[] message = in.readLine().split("\\s+");
 
-                if (message[0].equals("PUBLISH")) {
-
-                }
-
                 switch (message[0]) {
-                    case "PUBLISH":
+                    case "PUBLISH" -> {
                         String[] author = message[1].split(":@");
                         String userMessage = in.readLine();
+
                         executePublish(userMessage, author[1]);
-
                         out.write("OK".getBytes());
-                        break;
-
-                    case "RCV_IDS":
-
-
-                    case "RCV_MSG":
-
-                    default:
-                        System.out.println("ERROR");
+                    }
+                    case "RCV_IDS", "RCV_MSG", default -> System.out.println("ERROR");
                 }
 
                 clientSocket.close();
@@ -58,11 +47,35 @@ public class CentralizedServer {
     }
 
     private static void executePublish(String message, String author) {
-        System.out.println("Message de " + author + " : " + message);
+        try {
+            Class.forName("org.sqlite.JDBC");
+
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\talha\\Desktop\\Dev\\Java\\Microblogage\\db.sqlite");
+
+            Statement connectionStatement = connection.createStatement();
+
+            String request = String.format("SELECT * FROM Users WHERE Username = '%s'", author);
+
+            ResultSet user = connectionStatement.executeQuery(request);
+
+            while (user.next()) {
+                String insert = "INSERT INTO Posts (UserId, Content) VALUES (?, ?)";
+
+                PreparedStatement pstmt = connection.prepareStatement(insert);
+
+                pstmt.setInt(1, user.getInt("UserId"));
+                pstmt.setString(2, message);
+
+                pstmt.executeUpdate();
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static void main(String[] args) throws ClassNotFoundException {
-
+    public static void main(String[] args) throws IOException {
+        run();
     }
 
 }
