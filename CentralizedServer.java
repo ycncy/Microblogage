@@ -19,32 +19,17 @@ public class CentralizedServer {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-
-                System.out.println("///////////////////////////////////////////\nUn nouveau client s'est connecté \n");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-                OutputStream out = clientSocket.getOutputStream();
-
-                String[] message = in.readLine().split("\\s+");
-
-                switch (message[0]) {
-                    case "PUBLISH" -> {
-                        String[] author = message[1].split(":@");
-                        String userMessage = in.readLine();
-
-                        executePublish(userMessage, author[1]);
-                        out.write("OK".getBytes());
-                    }
-                    case "RCV_IDS", "RCV_MSG", default -> System.out.println("ERROR");
-                }
-
-                clientSocket.close();
-
-                System.out.println("Connexion avec le client fermée");
+                new Thread(new Handler(clientSocket)).start();
             }
         }
     }
+
+    public static void main(String[] args) throws IOException {
+        run();
+    }
+}
+
+class Handler implements Runnable {
 
     private static void executePublish(String message, String author) {
         try {
@@ -67,6 +52,9 @@ public class CentralizedServer {
                 pstmt.setString(2, message);
 
                 pstmt.executeUpdate();
+
+                pstmt.close();
+                connection.close();
             }
 
         } catch (ClassNotFoundException | SQLException e) {
@@ -74,8 +62,40 @@ public class CentralizedServer {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        run();
+    private Socket socket;
+
+    public Handler(Socket socket) {
+        this.socket = socket;
     }
 
+    @Override
+    public void run() {
+        try {
+            System.out.println("///////////////////////////////////////////\nUn nouveau client s'est connecté \n");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            OutputStream out = socket.getOutputStream();
+
+            String[] message = in.readLine().split("\\s+");
+
+            switch (message[0]) {
+                case "PUBLISH" -> {
+                    String[] author = message[1].split(":@");
+                    String userMessage = in.readLine();
+
+                    executePublish(userMessage, author[1]);
+                    out.write("OK".getBytes());
+                }
+                case "RCV_IDS", "RCV_MSG", default -> System.out.println("ERROR");
+
+            }
+
+            socket.close();
+
+            System.out.println("Connexion avec le client fermée");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
