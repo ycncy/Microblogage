@@ -1,6 +1,7 @@
+package client;
+
 import java.io.*;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.Scanner;
 
 public class Publisher {

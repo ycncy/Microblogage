@@ -1,3 +1,5 @@
+package database;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,7 +11,7 @@ public class Database {
         Class.forName("org.sqlite.JDBC");
 
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\talha\\Desktop\\Dev\\Java\\Microblogage\\db.sqlite");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:database/db.sqlite");
 
             Statement stmt = conn.createStatement();
 
