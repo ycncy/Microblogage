@@ -82,7 +82,7 @@ public class CentralizedServer {
                     switch (request) {
 
                         case "PUBLISH": publish.execute(client, header, body);
-                        case "RCV_MSG": publish.execute(client, header, body);
+                        //case "RCV_MSG": publish.execute(client, header, body);
 
                         default:
                             System.out.println("ERROR");

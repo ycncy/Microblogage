@@ -11,17 +11,13 @@ public class Publish implements Request {
     public void execute(SocketChannel client, String header, String body) {
         String[] headerArray = header.split("\\s+");
 
-        if (headerArray.length > 1) {
-            try {
-                client.write(ByteBuffer.wrap("La requête contient plus d'éléments que prévu".getBytes()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        String author = headerArray[0].split(":@")[1];
-
         try {
+
+            if (headerArray.length > 1)
+                client.write(ByteBuffer.wrap("La requête contient plus d'éléments que prévu".getBytes()));
+
+            String author = headerArray[0].split(":@")[1];
+
             Class.forName("org.sqlite.JDBC");
 
             Connection connection = DriverManager.getConnection("jdbc:sqlite:database/db.sqlite");
@@ -42,7 +38,9 @@ public class Publish implements Request {
 
                 pstmt.executeUpdate();
             }
-        } catch (ClassNotFoundException | SQLException e) {
+
+            client.write(ByteBuffer.wrap("OK".getBytes()));
+        } catch (ClassNotFoundException | SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
