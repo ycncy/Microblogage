@@ -1,31 +1,21 @@
 package server;
 
+import request.Publish;
+
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.nio.charset.*;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.regex.*;
 
 public class CentralizedServer {
 
-    private final static int port = 1234;
+    private static Publish publish = new Publish();
 
-    public CentralizedServer(int port) {
-        //this.port = port;
-    }
+    private final static int port = 1234;
 
     public static void main(String[] args) throws IOException {
 
@@ -91,18 +81,8 @@ public class CentralizedServer {
 
                     switch (request) {
 
-                        case "PUBLISH":
-                            String[] headerArray = header.split("\\s+");
-
-                            if (headerArray.length > 1) {
-                                client.write(ByteBuffer.wrap("La requête contient plus d'éléments que prévu".getBytes()));
-                                break;
-                            }
-
-                            String author = headerArray[0].split(":@")[1];
-
-                            executePublish(body, author);
-
+                        case "PUBLISH": publish.execute(client, header, body);
+                        case "RCV_MSG": publish.execute(client, header, body);
 
                         default:
                             System.out.println("ERROR");
@@ -112,35 +92,6 @@ public class CentralizedServer {
                     client.close();
                 }
             }
-        }
-    }
-
-
-    private static void executePublish(String message, String author) {
-        try {
-            Class.forName("org.sqlite.JDBC");
-
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:database/db.sqlite");
-
-            Statement connectionStatement = connection.createStatement();
-
-            String request = String.format("SELECT * FROM Users WHERE Username = '%s'", author);
-
-            ResultSet user = connectionStatement.executeQuery(request);
-
-            while (user.next()) {
-                String insert = "INSERT INTO Posts (UserId, Content) VALUES (?, ?)";
-
-                PreparedStatement pstmt = connection.prepareStatement(insert);
-
-                pstmt.setInt(1, user.getInt("UserId"));
-                pstmt.setString(2, message);
-
-                pstmt.executeUpdate();
-            }
-
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 }
