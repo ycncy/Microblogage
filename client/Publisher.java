@@ -1,51 +1,49 @@
 package client;
 
 import java.io.*;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
 
 public class Publisher {
 
     private static final String connectionAddress = "localhost";
     private static final int connectionPort = 1234;
 
-    public Publisher(String connectionAddress, int connectionPort) {
-        //this.connectionAddress = connectionAddress;
-        //this.connectionPort = connectionPort;
-    }
+    public static void main(String[] args) {
+        try {
+            SocketChannel client = SocketChannel.open(new InetSocketAddress(connectionAddress, connectionPort));
+            System.out.println("Connecté au serveur : " + client.getRemoteAddress());
 
-    public static void run() throws IOException {
-        Socket client = new Socket(connectionAddress, connectionPort);
-        System.out.println("Connecté au serveur : " + client.getRemoteSocketAddress());
+            String username;
+            StringBuilder message = new StringBuilder();
 
-        String username = "";
-        String message = "";
+            Scanner scanner = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
+            System.out.println("Entrez le nom d'utilisateur :");
 
-        System.out.println("Entrez le nom d'utilisateur :");
+            username = scanner.nextLine();
 
-        username = scanner.nextLine();
+            System.out.println("Entrez le contenu de votre message :");
 
-        System.out.println("Entrez le contenu de votre message :");
+            while (scanner.hasNext()) {
+                message.append(scanner.nextLine()).append("\n");
+            }
 
-        while (scanner.hasNext()) {
-            message += scanner.nextLine() + "\n";
+            String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
+
+            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
+            client.write(buffer);
+
+            buffer = ByteBuffer.allocate(1024);
+            client.read(buffer);
+            buffer.flip();
+            String response = new String(buffer.array()).trim();
+            System.out.println(response);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-
-        OutputStream outToServer = client.getOutputStream();
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        DataOutputStream out = new DataOutputStream(outToServer);
-
-        String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
-        out.writeBytes(request);
-
-        System.out.println(inFromServer.readLine());
-
-        client.close();
-    }
-
-    public static void main(String[] args) throws IOException {
-        run();
     }
 }

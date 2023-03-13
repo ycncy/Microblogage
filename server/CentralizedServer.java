@@ -1,19 +1,18 @@
 package server;
 
-import request.Publish;
-
+import request.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.nio.charset.*;
-import java.sql.*;
 import java.util.*;
 import java.util.regex.*;
 
 public class CentralizedServer {
 
-    private static Publish publish = new Publish();
+    private static final Publish publish = new Publish();
+    private static final ReceiveMessages receiveMessages = new ReceiveMessages();
 
     private final static int port = 1234;
 
@@ -49,20 +48,19 @@ public class CentralizedServer {
 
                 if (key.isReadable()) {
                     SocketChannel client = (SocketChannel) key.channel();
+                    StringBuilder sb = new StringBuilder();
 
-                    ByteBuffer buffer = ByteBuffer.allocate(20000);
-
-                    StringBuilder data = new StringBuilder();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
 
                     while (client.read(buffer) > 0) {
                         buffer.flip();
-                        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
-                        CharBuffer charBuffer = decoder.decode(buffer);
-                        data.append(charBuffer);
+                        sb.append(Charset.defaultCharset().decode(buffer));
                         buffer.clear();
                     }
 
-                    String message = data.toString();
+                    String message = sb.toString();
+
+                    buffer.clear();
 
                     String[] parts = message.split("\r\n");
 
@@ -81,14 +79,13 @@ public class CentralizedServer {
 
                     switch (request) {
 
-                        case "PUBLISH": publish.execute(client, header, body);
-                        //case "RCV_MSG": publish.execute(client, header, body);
+                        case "PUBLISH":
+                            publish.execute(client, header, body);
 
-                        default:
-                            System.out.println("ERROR");
+                        case "RCV_MSG":
+                            receiveMessages.execute(client, header, body);
                     }
 
-                    buffer.clear();
                     client.close();
                 }
             }
