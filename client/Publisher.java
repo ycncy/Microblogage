@@ -31,7 +31,8 @@ public class Publisher {
                 message.append(scanner.nextLine()).append("\n");
             }
 
-            String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
+            String request = "RCV_IDS author:@yacine since_id:8 limit:8\r\n \r\n";
+            //String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
 
             ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
             client.write(buffer);

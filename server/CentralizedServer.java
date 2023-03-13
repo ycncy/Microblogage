@@ -82,7 +82,7 @@ public class CentralizedServer {
                         case "PUBLISH":
                             publish.execute(client, header, body);
 
-                        case "RCV_MSG":
+                        case "RCV_IDS":
                             receiveMessages.execute(client, header, body);
                     }
 
