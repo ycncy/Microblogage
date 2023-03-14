@@ -33,12 +33,13 @@ public class Publish implements Request {
             ResultSet user = connectionStatement.executeQuery(request);
 
             while (user.next()) {
-                String insert = "INSERT INTO Posts (UserId, Content) VALUES (?, ?)";
+                String insert = "INSERT INTO Posts (UserId, Content, author) VALUES (?, ?, ?)";
 
                 PreparedStatement pstmt = connection.prepareStatement(insert);
 
                 pstmt.setInt(1, user.getInt("UserId"));
                 pstmt.setString(2, body);
+                pstmt.setString(3, author);
 
                 pstmt.executeUpdate();
             }
