@@ -14,6 +14,8 @@ public class CentralizedServer {
     private static final Publish publish = new Publish();
     private static final ReceiveIDS receiveIDS = new ReceiveIDS();
     private static final ReceiveMessages receiveMessages = new ReceiveMessages();
+    private static final Reply reply = new Reply();
+    private static final Republish republish = new Republish();
 
     private final static int port = 1234;
 
@@ -86,6 +88,12 @@ public class CentralizedServer {
 
                     if (request.equals("RCV_MSG"))
                         receiveMessages.execute(client, header, body);
+
+                    if (request.equals("REPLY"))
+                        reply.execute(client, header, body);
+
+                    if (request.equals("REPUBLISH"))
+                        republish.execute(client, header, body);
 
                     client.close();
                 }

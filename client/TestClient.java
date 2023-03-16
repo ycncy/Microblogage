@@ -12,7 +12,7 @@ public class TestClient {
             SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
             System.out.println("Connecté au serveur : " + client.getRemoteAddress());
 
-            String request = "RCV_MSG msg_id:5\r\n\r\n";
+            String request = "REPUBLISH author:@matteo msg_id:1\r\n\r\n";
 
             ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
             client.write(buffer);

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 
 public class Follower {
 
@@ -26,20 +24,23 @@ public class Follower {
             buffer.flip();
             String[] response = new String(buffer.array()).trim().split("\n");
 
-            client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
+            //Demande et affiche les messages demandés
+            for (int i = 1; i < response.length; i++) {
+                client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
 
-            String rcv_msg_request = String.format("RCV_MSG msg_id:%s", response[1]);
+                String rcv_msg_request = String.format("RCV_MSG msg_id:%s", response[1]);
 
-            ByteBuffer messageBuffer = ByteBuffer.wrap(rcv_msg_request.getBytes());
-            client.write(messageBuffer);
+                ByteBuffer messageBuffer = ByteBuffer.wrap(rcv_msg_request.getBytes());
+                client.write(messageBuffer);
 
-            messageBuffer = ByteBuffer.allocate(4096);
-            client.read(messageBuffer);
-            messageBuffer.flip();
-            String message = new String(messageBuffer.array()).trim();
+                messageBuffer = ByteBuffer.allocate(4096);
+                client.read(messageBuffer);
+                messageBuffer.flip();
+                String msg_response = new String(messageBuffer.array()).trim();
+                String message = msg_response.split("\r\n")[1];
 
-            System.out.println(message);
-
+                System.out.printf("Message %s : %s%n", response[i], message);
+            }
 
         } catch (IOException e) {
             System.out.println(e.getMessage());

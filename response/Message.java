@@ -15,11 +15,11 @@ public class Message {
 
             Statement connectionStatement = connection.createStatement();
 
-            String request = String.format("SELECT * FROM Posts WHERE %s", condition);
+            String request = String.format("SELECT * FROM Messages WHERE %s", condition);
 
             ResultSet result = connectionStatement.executeQuery(request);
 
-            String author = result.getString("author");
+            String author = result.getString("Author");
             int message_id = result.getInt("MessageId");
             String content = result.getString("Content");
 

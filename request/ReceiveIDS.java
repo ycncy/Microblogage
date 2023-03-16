@@ -18,11 +18,11 @@ public class ReceiveIDS implements Request {
         StringBuilder select_condition = new StringBuilder();
 
         if (header_map.containsKey("author") && header_map.containsKey("tag"))
-            select_condition.append(String.format("author='%s' AND tag='%s'", header_map.get("author"), header_map.get("tag")));
+            select_condition.append(String.format("Author='%s' AND Tag='%s'", header_map.get("author"), header_map.get("tag")));
         else if (header_map.containsKey("tag"))
-            select_condition.append(String.format("tag='%s'", header_map.get("tag")));
+            select_condition.append(String.format("Tag='%s'", header_map.get("tag")));
         else if (header_map.containsKey("author"))
-            select_condition.append(String.format("author='%s'", header_map.get("author")));
+            select_condition.append(String.format("Author='%s'", header_map.get("author")));
 
         if (header_map.containsKey("since_id")) {
             if (!select_condition.toString().isEmpty()) select_condition.append(" AND ");

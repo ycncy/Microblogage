@@ -15,7 +15,7 @@ public class MessageIds {
 
             Statement connectionStatement = connection.createStatement();
 
-            String request = String.format("SELECT MessageId FROM Posts WHERE %s", condition);
+            String request = String.format("SELECT MessageId FROM Messages WHERE %s", condition);
 
             ResultSet result = connectionStatement.executeQuery(request);
 
