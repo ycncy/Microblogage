@@ -27,6 +27,8 @@ public class MessageIds {
 
             client.write(ByteBuffer.wrap(("MSG_IDS\r\n" + corps).getBytes()));
 
+            connectionStatement.close();
+
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

@@ -46,6 +46,8 @@ public class Publish implements Request {
 
             client.write(ByteBuffer.wrap("OK".getBytes()));
 
+            connectionStatement.close();
+
         } catch (ClassNotFoundException | SQLException | IOException e) {
             throw new RuntimeException(e);
         }

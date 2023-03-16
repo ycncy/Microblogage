@@ -51,7 +51,7 @@ public class CentralizedServer {
                     SocketChannel client = (SocketChannel) key.channel();
                     StringBuilder sb = new StringBuilder();
 
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    ByteBuffer buffer = ByteBuffer.allocate(4096);
 
                     while (client.read(buffer) > 0) {
                         buffer.flip();
@@ -78,17 +78,14 @@ public class CentralizedServer {
                         header = m.group(2);
                     }
 
-                    switch (request) {
+                    if (request.equals("PUBLISH"))
+                        publish.execute(client, header, body);
 
-                        case "PUBLISH":
-                            publish.execute(client, header, body);
+                    if (request.equals("RCV_IDS"))
+                        receiveIDS.execute(client, header, body);
 
-                        case "RCV_IDS":
-                            receiveIDS.execute(client, header, body);
-
-                        case "RCV_MSG":
-                            receiveMessages.execute(client, header, body);
-                    }
+                    if (request.equals("RCV_MSG"))
+                        receiveMessages.execute(client, header, body);
 
                     client.close();
                 }

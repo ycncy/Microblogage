@@ -21,7 +21,7 @@ public class Message {
 
             String author = result.getString("author");
             int message_id = result.getInt("MessageId");
-            String content = result.getString("content");
+            String content = result.getString("Content");
 
             String header = String.format("MSG author:@%s msg_id:%d", author, message_id);
 
@@ -30,6 +30,8 @@ public class Message {
             ByteBuffer data = ByteBuffer.wrap(response.getBytes());
 
             client.write(data);
+
+            connectionStatement.close();
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
