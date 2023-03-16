@@ -12,6 +12,7 @@ import java.util.regex.*;
 public class CentralizedServer {
 
     private static final Publish publish = new Publish();
+    private static final ReceiveIDS receiveIDS = new ReceiveIDS();
     private static final ReceiveMessages receiveMessages = new ReceiveMessages();
 
     private final static int port = 1234;
@@ -70,7 +71,7 @@ public class CentralizedServer {
 
                     String request = "";
                     String header = "";
-                    String body = parts[1];
+                    String body = parts.length > 1 ? parts[1] : "";
 
                     if (m.find()) {
                         request = m.group(1);
@@ -83,6 +84,9 @@ public class CentralizedServer {
                             publish.execute(client, header, body);
 
                         case "RCV_IDS":
+                            receiveIDS.execute(client, header, body);
+
+                        case "RCV_MSG":
                             receiveMessages.execute(client, header, body);
                     }
 
