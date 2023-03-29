@@ -1,9 +1,15 @@
 package request;
 
+import server.ClientHandler;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static server.ClientHandler.followers;
+import static server.ClientHandler.queues;
 
 public class Publish implements Request {
 
@@ -31,6 +37,12 @@ public class Publish implements Request {
             ResultSet user = connectionStatement.executeQuery(request);
 
             while (user.next()) {
+                for (String username : followers.keySet()) {
+                    for (String follower : followers.get(username)) {
+                        queues.get(follower).add("Message de " + username + " : \n" + body);
+                    }
+                }
+
                 String insert = "INSERT INTO Messages (AuthorId, Content, Author) VALUES (?, ?, ?)";
 
                 PreparedStatement pstmt = connection.prepareStatement(insert);

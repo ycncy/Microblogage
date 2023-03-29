@@ -8,9 +8,6 @@ import java.util.*;
 
 public class Publisher {
 
-    private static final String connectionAddress = "localhost";
-    private static final int connectionPort = 1234;
-
     public static void main(String[] args) {
         try {
             Socket client = new Socket("localhost", 1234);
@@ -41,7 +38,6 @@ public class Publisher {
 
             String response = in.readLine();
             System.out.println(response);
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
