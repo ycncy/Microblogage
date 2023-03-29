@@ -1,6 +1,5 @@
 package server;
 
-import request.*;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
@@ -20,17 +19,8 @@ public class CentralizedServer {
         while (true) {
             Socket client = serverSocket.accept();
 
-            ClientHandler clientHandler = new ClientHandler(client);
-            executorService.submit(clientHandler);
+            CentralizedServerHandler centralizedServerHandler = new CentralizedServerHandler(client);
+            executorService.submit(centralizedServerHandler);
         }
-    }
-
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 }

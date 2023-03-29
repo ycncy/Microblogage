@@ -1,15 +1,12 @@
 package request;
 
-import server.ClientHandler;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static server.ClientHandler.followers;
-import static server.ClientHandler.queues;
+import static server.MicroblogHandler.followers;
+import static server.MicroblogHandler.queues;
 
 public class Publish implements Request {
 

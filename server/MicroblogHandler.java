@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ClientHandler implements Runnable {
+public class MicroblogHandler implements Runnable {
 
     private static final Publish publish = new Publish();
     private static final ReceiveIDS receiveIDS = new ReceiveIDS();
@@ -25,7 +25,7 @@ public class ClientHandler implements Runnable {
 
     private final Socket client;
 
-    public ClientHandler(Socket client) {
+    public MicroblogHandler(Socket client) {
         this.client = client;
     }
 
@@ -66,7 +66,6 @@ public class ClientHandler implements Runnable {
                 switch (request) {
                     case "PUBLISH":
                         publish.execute(client, header, body);
-                        //System.out.println(queues);
                         break;
                     case "RCV_IDS":
                         receiveIDS.execute(client, header, body);
@@ -96,7 +95,6 @@ public class ClientHandler implements Runnable {
                         }
                         break;
                     case "SUBSCRIBE":
-                        // Subscribe the client to messages from the specified author or tag
                         String author = header_map.get("author");
                         String tag = header_map.get("tag");
                         if (author != null) {

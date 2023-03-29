@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.sql.*;
 
 public class Message {
@@ -34,7 +32,7 @@ public class Message {
 
             System.out.println(response);
 
-            out.write(response);
+            out.println(response);
             out.flush();
 
             connectionStatement.close();

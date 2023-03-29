@@ -29,8 +29,6 @@ public class Follower {
                 response.add(line);
             }
 
-            System.out.println(response);
-
             //Demande et affiche les messages demandés
             for (int i = 1; i < response.size(); i++) {
                 String rcv_msg_request = "RCV_MSG msg_id:" + response.get(i);
