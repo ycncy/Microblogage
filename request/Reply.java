@@ -3,6 +3,9 @@ package request;
 import util.StringSplitter;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.sql.*;
@@ -11,7 +14,7 @@ import java.util.Map;
 public class Reply implements Request {
 
     @Override
-    public void execute(SocketChannel clientSocket, String header, String body) throws IOException {
+    public void execute(Socket clientSocket, String header, String body) throws IOException {
         Map<String, String> header_map = StringSplitter.split(header);
 
         String author = header_map.get("author");
@@ -39,7 +42,10 @@ public class Reply implements Request {
 
             pstmt.executeUpdate();
 
-            clientSocket.write(ByteBuffer.wrap("OK".getBytes()));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+            out.write("OK");
+            out.flush();
 
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);

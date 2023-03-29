@@ -1,45 +1,47 @@
 package client;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.*;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Follower {
 
     public static void main(String[] args) {
         try {
-            SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
-            System.out.println("Connecté au serveur : " + client.getRemoteAddress());
+            Socket client = new Socket("localhost", 1234);
+            System.out.println("Connecté au serveur");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
 
             //Demande les 5 derniers messages de "yacine"
-            String request = "RCV_IDS author:yacine limit:5\r\n\r\n";
+            String request = "RCV_IDS author:@yacine limit:5\r\n\r\n";
 
-            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-            client.write(buffer);
+            out.println(request);
+            out.flush();
+
 
             //Reçoit les identifiants
-            buffer = ByteBuffer.allocate(1024);
-            client.read(buffer);
-            buffer.flip();
-            String[] response = new String(buffer.array()).trim().split("\n");
+            String line;
+            List<String> response = new ArrayList<>();
+            while (!(line = in.readLine()).equals("")) {
+                response.add(line);
+            }
+
+            System.out.println(response);
 
             //Demande et affiche les messages demandés
-            for (int i = 1; i < response.length; i++) {
-                client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
+            for (int i = 1; i < response.size(); i++) {
+                String rcv_msg_request = "RCV_MSG msg_id:" + response.get(i);
 
-                String rcv_msg_request = String.format("RCV_MSG msg_id:%s", response[1]);
+                out.println(rcv_msg_request);
+                out.flush();
 
-                ByteBuffer messageBuffer = ByteBuffer.wrap(rcv_msg_request.getBytes());
-                client.write(messageBuffer);
-
-                messageBuffer = ByteBuffer.allocate(4096);
-                client.read(messageBuffer);
-                messageBuffer.flip();
-                String msg_response = new String(messageBuffer.array()).trim();
-                String message = msg_response.split("\r\n")[1];
-
-                System.out.printf("Message %s : %s%n", response[i], message);
+                String tmp;
+                while ((tmp = in.readLine()) != null) {
+                    System.out.println(tmp);
+                }
             }
 
         } catch (IOException e) {

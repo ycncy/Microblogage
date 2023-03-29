@@ -4,6 +4,7 @@ import response.Message;
 import util.StringSplitter;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class ReceiveMessages implements Request {
     private final Message messageResponse = new Message();
 
     @Override
-    public void execute(SocketChannel clientSocket, String header, String body) throws IOException {
+    public void execute(Socket clientSocket, String header, String body) throws IOException {
         Map<String, String> header_map = StringSplitter.split(header);
 
         String select_condition = String.format("MessageId=%s", header_map.get("msg_id"));

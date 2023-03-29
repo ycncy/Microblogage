@@ -1,13 +1,16 @@
 package response;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.sql.*;
 
 public class Message {
 
-    public void execute(SocketChannel client, String condition) throws IOException {
+    public void execute(Socket client, String condition) throws IOException {
         try {
             Class.forName("org.sqlite.JDBC");
 
@@ -27,9 +30,12 @@ public class Message {
 
             String response = String.format("%s\r\n%s\r\n", header, content);
 
-            ByteBuffer data = ByteBuffer.wrap(response.getBytes());
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
 
-            client.write(data);
+            System.out.println(response);
+
+            out.write(response);
+            out.flush();
 
             connectionStatement.close();
         } catch (SQLException | ClassNotFoundException e) {

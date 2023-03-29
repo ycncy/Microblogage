@@ -1,22 +1,20 @@
 package request;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.sql.*;
 
 public class Publish implements Request {
 
     @Override
-    public void execute(SocketChannel client, String header, String body) {
+    public void execute(Socket client, String header, String body) throws IOException {
         String[] headerArray = header.split("\\s+");
 
+        PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+
         if (headerArray.length > 1) {
-            try {
-                client.write(ByteBuffer.wrap("La requête contient plus d'éléments que prévu".getBytes()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            out.write("La requête contient plus d'éléments que prévu");
         }
 
         String author = headerArray[0].split(":@")[1];
@@ -44,11 +42,10 @@ public class Publish implements Request {
                 pstmt.executeUpdate();
             }
 
-            client.write(ByteBuffer.wrap("OK".getBytes()));
+            out.println("OK");
+            out.flush();
 
-            connectionStatement.close();
-
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

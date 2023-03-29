@@ -1,22 +1,22 @@
 package request;
 
-import org.w3c.dom.ls.LSOutput;
 import util.StringSplitter;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.*;
+import java.net.Socket;
 import java.sql.*;
-import java.util.Map;
+import java.util.*;
 
 public class Republish implements Request {
 
     @Override
-    public void execute(SocketChannel clientSocket, String header, String body) throws IOException {
+    public void execute(Socket clientSocket, String header, String body) throws IOException {
         Map<String, String> header_map = StringSplitter.split(header);
 
         String author = header_map.get("author");
         String msg_id = header_map.get("msg_id");
+
+        System.out.println(author);
+        System.out.println(msg_id);
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -42,11 +42,14 @@ public class Republish implements Request {
 
             preparedStatement.executeUpdate();
 
-            clientSocket.write(ByteBuffer.wrap("OK".getBytes()));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+            out.println("OK");
+            out.flush();
 
             connectionStatement.close();
 
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

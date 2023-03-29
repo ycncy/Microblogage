@@ -1,13 +1,15 @@
 package response;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.sql.*;
 
 public class MessageIds {
 
-    public void execute(SocketChannel client, String condition) throws IOException {
+    public void execute(Socket client, String condition) throws IOException {
         try {
             Class.forName("org.sqlite.JDBC");
 
@@ -25,7 +27,10 @@ public class MessageIds {
                 corps += result.getInt("MessageId") + "\n";
             }
 
-            client.write(ByteBuffer.wrap(("MSG_IDS\r\n" + corps).getBytes()));
+            PrintWriter out = new PrintWriter(client.getOutputStream());
+
+            out.println(("MSG_IDS\r\n" + corps + "\r\n"));
+            out.flush();
 
             connectionStatement.close();
 

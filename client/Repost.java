@@ -1,55 +1,49 @@
 package client;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 public class Repost {
 
     public static void main(String[] args) {
-        String[] users = {"matteo", "yacine"};
+        String[] users = {"yacine", "matteo"};
 
         try {
             List<String> ids = new ArrayList<>();
 
+            Socket client = new Socket("localhost", 1234);
+            System.out.println("Connecté au serveur");
+
             for (String user : users) {
-                SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
-                System.out.println("Connecté au serveur : " + client.getRemoteAddress());
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
 
-                String request = String.format("RCV_IDS author:@%s", user);
+                String request = String.format("RCV_IDS author:@%s\r\n\r\n", user);
 
-                ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-                client.write(buffer);
+                out.println(request);
+                out.flush();
 
-                buffer = ByteBuffer.allocate(1024);
-                client.read(buffer);
-                buffer.flip();
-                String response = new String(buffer.array()).trim();
+                String line;
+                List<String> new_ids = new ArrayList<>();
+                while (!(line = in.readLine()).equals("")) {
+                    new_ids.add(line);
+                }
 
-                String[] rcv_ids = response.split("\n");
-
-                for (int i = 1; i < rcv_ids.length; i++) ids.add(rcv_ids[i]);
+                for (int i = 1; i < new_ids.size(); i++) ids.add(new_ids.get(i));
             }
 
             for (String id : ids) {
-                SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 1234));
-                System.out.println("Connecté au serveur : " + client.getRemoteAddress());
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
 
-                String request = String.format("REPUBLISH author:@yacine msg_id:%s", id);
+                String request = "REPUBLISH author:@yacine msg_id:" + id + "\r\n\r\n";
 
-                ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-                client.write(buffer);
+                out.println(request);
+                out.flush();
 
-                buffer = ByteBuffer.allocate(1024);
-                client.read(buffer);
-                buffer.flip();
-                String response = new String(buffer.array()).trim();
-
-                System.out.println(response);
+                String line = in.readLine();
+                System.out.println(line);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

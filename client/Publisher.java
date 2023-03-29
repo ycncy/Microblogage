@@ -13,8 +13,11 @@ public class Publisher {
 
     public static void main(String[] args) {
         try {
-            SocketChannel client = SocketChannel.open(new InetSocketAddress(connectionAddress, connectionPort));
-            System.out.println("Connecté au serveur : " + client.getRemoteAddress());
+            Socket client = new Socket("localhost", 1234);
+            System.out.println("Connecté au serveur");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
 
             String username;
             StringBuilder message = new StringBuilder();
@@ -33,13 +36,10 @@ public class Publisher {
 
             String request = "PUBLISH author:@" + username + "\r\n" + message + "\r\n";
 
-            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-            client.write(buffer);
+            out.println(request);
+            out.flush();
 
-            buffer = ByteBuffer.allocate(1024);
-            client.read(buffer);
-            buffer.flip();
-            String response = new String(buffer.array()).trim();
+            String response = in.readLine();
             System.out.println(response);
 
         } catch (IOException e) {
